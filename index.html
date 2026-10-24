@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="naver-site-verification" content="e65eb82ae114b4bcc07e01815551cd4582bd7e57" />
   <title>대방OK공인중개사사무소 | 새솔동 부동산 전문</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -35,7 +36,7 @@
           </div>
         </div>
 
-        <!-- Desktop Menu (카테고리 버튼은 JS가 앞쪽에 채움) -->
+        <!-- Desktop Menu -->
         <div id="menuDesktop" class="hidden md:flex items-center space-x-6 font-semibold text-gray-700 text-sm sm:text-base">
           <button type="button" onclick="openModal('inquiryModal')" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2.5 rounded-xl transition text-sm font-extrabold flex items-center gap-1.5 shadow-sm cursor-pointer">
             <i class="fa-solid fa-file-pen"></i> 간편 매물/상담 접수
@@ -101,7 +102,7 @@
     </div>
   </header>
 
-  <!-- Category Filter Cards (JS가 채움) -->
+  <!-- Category Filter Cards -->
   <section class="max-w-7xl mx-auto px-4 py-8 -mt-6 relative z-20">
     <div id="catGrid" class="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4"></div>
   </section>
@@ -234,7 +235,6 @@
 
       <form id="inquiryForm" onsubmit="submitInquiry(event)" class="space-y-4 text-sm">
         <input type="hidden" id="inquiryType" value="집 내놓기(매물접수)">
-        <!-- 봇 차단용 숨김칸 -->
         <input type="text" id="inqHp" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
 
         <div id="sellFields" class="space-y-4">
@@ -356,7 +356,7 @@
     </div>
   </div>
 
-  <!-- 매물 문의 방법 선택 (카카오톡 / 전화) -->
+  <!-- 매물 문의 방법 선택 -->
   <div id="contactModal" onclick="if (event.target === this) closeModal('contactModal')" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl relative">
       <button type="button" onclick="closeModal('contactModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl font-bold">✕</button>
@@ -482,7 +482,7 @@
         <!-- 3) 비밀번호 변경 -->
         <div id="adminSecPassword" class="hidden space-y-4">
           <h4 class="font-bold text-gray-900 mb-2">관리자 비밀번호 변경</h4>
-          <p class="text-xs text-gray-500 mb-4">현재 비밀번호와 새로 사용할 비밀번호(6자리 이상)를 입력해 주세요.</p>
+          <p class="text-xs text-gray-500 mb-4">현재 비밀번호와 새로 사용할 비밀번호를 입력해 주세요.</p>
           <div class="space-y-3">
             <div>
               <label class="block font-bold text-gray-700 text-xs mb-1">현재 비밀번호</label>
@@ -506,7 +506,6 @@
   </div>
 
   <script>
-    // ★ Apps Script 배포 후 받은 웹 앱 URL 적용 완료
     const API_URL = 'https://script.google.com/macros/s/AKfycbw439BPX29tytQBNrDGvhvZLv6Q9H-EPtEfRRl5x-eYKEdGWg12iA5FsmON6_JH7_vU/exec';
     const READY = API_URL.indexOf('https://script.google.com/') === 0;
     const OFFICE_TEL = '031-355-8829';
@@ -546,159 +545,185 @@
       return data;
     }
 
-    function openModal(id) {
-      $(id).classList.remove('hidden');
-      if (id === 'adminModal' && !adminPw) {
-        $('adminAuthSection').classList.remove('hidden');
-        $('adminPanelSection').classList.add('hidden');
-        $('adminPwInput').value = '';
-      }
-    }
+    function openModal(id) { $(id).classList.remove('hidden'); }
     function closeModal(id) { $(id).classList.add('hidden'); }
     function toggleMobileMenu() { $('mobileMenu').classList.toggle('hidden'); }
 
-    function buildMenus() {
-      $('menuDesktop').insertAdjacentHTML('afterbegin', CATS.map(c =>
-        `<button type="button" onclick="filterCategory('${c[0]}')" class="hover:text-amber-600 transition py-2">${c[1]}</button>`).join(''));
-      $('mobileCats').innerHTML = CATS.map(c =>
-        `<button type="button" onclick="filterCategory('${c[0]}'); toggleMobileMenu()" class="block w-full text-left py-2 font-medium text-gray-700">${c[1]}</button>`).join('');
-      $('catGrid').innerHTML = CATS.map((c, i) =>
-        `<button type="button" onclick="filterCategory('${c[0]}')" data-cat="${c[0]}" class="cat-btn bg-white p-4 sm:p-5 rounded-2xl shadow-md border hover:border-amber-500 hover:shadow-lg transition text-center group${i === 4 ? ' col-span-2 md:col-span-1' : ''}">
-           <div class="text-3xl mb-2 text-amber-500 group-hover:scale-110 transition">${c[3]}</div>
-           <div class="font-bold text-gray-800 text-sm sm:text-base">${c[2]}</div>
-         </button>`).join('');
+    function renderCats() {
+      const desktop = $('menuDesktop');
+      const mobile = $('mobileCats');
+      let htmlD = '';
+      let htmlM = '';
+
+      CATS.forEach(([id, name, desc, icon]) => {
+        const active = currentCategory === id;
+        const cls = active ? 'bg-amber-500 text-white shadow-sm' : 'bg-gray-100 hover:bg-gray-200 text-gray-700';
+        htmlD += `<button type="button" onclick="filterCategory('${id}')" class="px-3.5 py-2 rounded-xl text-sm font-bold transition cursor-pointer ${cls}">${icon} ${name}</button>`;
+        htmlM += `<button type="button" onclick="filterCategory('${id}'); toggleMobileMenu()" class="block w-full text-left py-2 font-bold ${active ? 'text-amber-600' : 'text-gray-700'}">${icon} ${name} 보기</button>`;
+      });
+
+      desktop.innerHTML = htmlD + `<button type="button" onclick="openModal('inquiryModal')" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2.5 rounded-xl transition text-sm font-extrabold flex items-center gap-1.5 shadow-sm cursor-pointer"><i class="fa-solid fa-file-pen"></i> 간편 매물/상담 접수</button><button type="button" onclick="openModal('adminModal')" class="bg-amber-500 hover:bg-amber-600 text-white px-3.5 py-2.5 rounded-xl transition text-sm font-bold flex items-center gap-1.5 shadow-sm cursor-pointer"><i class="fa-solid fa-lock text-xs"></i> 매물 관리자</button>`;
+      mobile.innerHTML = htmlM;
     }
 
     function filterCategory(cat) {
       currentCategory = cat;
-      document.querySelectorAll('.cat-btn').forEach(b => {
-        const on = b.dataset.cat === cat;
-        b.classList.toggle('border-amber-500', on);
-        b.classList.toggle('bg-amber-50/50', on);
-        b.classList.toggle('border-gray-100', !on);
-      });
-      $('sectionTitle').textContent = CATS.find(c => c[0] === cat)[4];
+      const found = CATS.find(c => c[0] === cat);
+      $('sectionTitle').innerText = found ? found[4] : '전체 매물 목록';
+      renderCats();
       renderListings();
     }
 
     async function loadListings() {
-      listings = null; listError = '';
-      renderListings();
-      if (!READY) { listError = '매물 서버 설정(API 주소)이 아직 연결되지 않았습니다.'; renderListings(); return; }
+      const grid = $('listingsGrid');
+      grid.innerHTML = msgBox('매물 데이터를 불러오는 중입니다...', false);
       try {
-        const r = await fetch(API_URL);
-        const d = await r.json();
-        if (!d.ok) throw new Error(d.error);
-        listings = d.listings || [];
+        const data = await api({ action: 'getListings' });
+        listings = data.listings || [];
+        renderListings();
+        renderAdminItemsList();
       } catch (e) {
-        listError = '매물을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.';
+        listError = e.message;
+        grid.innerHTML = msgBox(`매물을 불러오지 못했습니다.<br><span class="text-xs text-red-500">${esc(listError)}</span>`, true);
       }
-      renderListings();
-    }
-
-    function card(it) {
-      return `
-        <div class="bg-white rounded-3xl shadow-md border border-gray-100 overflow-hidden hover:shadow-xl transition duration-300 flex flex-col group">
-          <div class="relative h-52 bg-gray-100 overflow-hidden flex items-center justify-center text-5xl text-gray-300">🏢
-            ${it.img ? `<img src="${esc(it.img)}" alt="${esc(it.title)}" loading="lazy" onerror="this.remove()" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">` : ''}
-            <span class="absolute top-4 left-4 bg-amber-500 text-white text-xs font-extrabold px-3 py-1.5 rounded-lg shadow">${esc(it.type)}</span>
-            <span class="absolute top-4 right-4 bg-slate-900/80 text-white text-xs px-2.5 py-1 rounded-md backdrop-blur-sm font-medium">${esc(CAT_NAME[it.cat] || '기타')}</span>
-          </div>
-          <div class="p-6 flex-grow flex flex-col justify-between">
-            <div>
-              <h4 class="font-extrabold text-lg text-gray-900 mb-1 leading-snug group-hover:text-amber-600 transition">${esc(it.title)}</h4>
-              <p class="text-amber-600 font-extrabold text-2xl mb-2">${esc(it.price)}</p>
-              <p class="text-xs text-gray-500 font-bold mb-3 bg-gray-100 inline-block px-2.5 py-1 rounded-md">면적: ${esc(it.size)}</p>
-              <p class="text-sm text-gray-600 line-clamp-2 leading-relaxed mb-5">${esc(it.desc)}</p>
-            </div>
-            <button type="button" onclick="openContact('${esc(it.id)}')" class="w-full text-center bg-slate-900 hover:bg-amber-600 text-white font-bold py-3 rounded-2xl transition text-sm flex items-center justify-center gap-2 shadow-sm">
-              <i class="fa-solid fa-comments"></i> 매물 문의하기
-            </button>
-          </div>
-        </div>`;
     }
 
     function renderListings() {
       const grid = $('listingsGrid');
-      if (listings === null) {
-        $('itemCount').textContent = 0;
-        grid.innerHTML = msgBox(listError || '매물을 불러오는 중입니다...', !!listError);
-      } else {
-        const f = currentCategory === 'ALL' ? listings : listings.filter(i => i.cat === currentCategory);
-        $('itemCount').textContent = f.length;
-        grid.innerHTML = f.length ? f.map(card).join('') : msgBox('등록된 매물이 없습니다. 상단 [간편 접수] 또는 전화(' + OFFICE_TEL + ')로 문의해 주세요.');
+      if (!listings) return;
+
+      const filtered = currentCategory === 'ALL' ? listings : listings.filter(item => item.cat === currentCategory);
+      $('itemCount').innerText = filtered.length;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = msgBox('등록된 매물이 없습니다.', false);
+        return;
       }
-      renderAdminList();
+
+      let html = '';
+      filtered.forEach(item => {
+        const badgeColor = item.type === '매매' ? 'bg-red-500' : item.type === '전세' ? 'bg-teal-600' : 'bg-blue-600';
+        const imgTag = item.img 
+          ? `<img src="${esc(item.img)}" alt="${esc(item.title)}" class="w-full h-48 object-cover group-hover:scale-105 transition duration-300">`
+          : `<div class="w-full h-48 bg-gradient-to-br from-slate-800 to-amber-900 flex flex-col items-center justify-center text-white p-4 text-center">
+               <span class="text-3xl mb-1">🏢</span>
+               <span class="font-bold text-sm tracking-tight">대방OK부동산 프리미엄 중개</span>
+               <span class="text-xs text-amber-300 mt-1">상세 사진 및 현장 브리핑 문의</span>
+             </div>`;
+
+        html += `
+          <div class="bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition border border-gray-100 flex flex-col group">
+            <div class="relative overflow-hidden bg-gray-100">
+              <span class="absolute top-3 left-3 z-10 ${badgeColor} text-white text-xs font-extrabold px-3 py-1 rounded-full shadow">${esc(item.type)}</span>
+              <span class="absolute top-3 right-3 z-10 bg-slate-900/80 backdrop-blur-sm text-amber-300 text-xs font-bold px-2.5 py-1 rounded-lg">${esc(CAT_NAME[item.cat] || '기타')}</span>
+              ${imgTag}
+            </div>
+            <div class="p-6 flex flex-col flex-grow">
+              <div class="mb-3">
+                <h4 class="text-lg font-extrabold text-gray-900 group-hover:text-amber-600 transition mb-1">${esc(item.title)}</h4>
+                <p class="text-xs text-gray-500 font-medium">📐 면적: <strong class="text-gray-700">${esc(item.size)}</strong></p>
+              </div>
+              <div class="mb-4">
+                <span class="text-2xl font-black text-amber-600 tracking-tight">${esc(item.price)}</span>
+              </div>
+              <div class="bg-amber-50/70 border border-amber-100 p-3 rounded-2xl mb-5 flex-grow">
+                <p class="text-xs text-gray-700 leading-relaxed">✨ ${esc(item.desc)}</p>
+              </div>
+              <button type="button" onclick='openContactModal(${JSON.stringify(item)})' class="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold py-3 rounded-2xl transition shadow-md flex items-center justify-center gap-2 text-sm cursor-pointer">
+                <i class="fa-solid fa-headset text-amber-400"></i> 이 매물 문의하기
+              </button>
+            </div>
+          </div>
+        `;
+      });
+      grid.innerHTML = html;
     }
 
-    function openContact(id) {
-      const it = (listings || []).find(x => x.id === id);
-      if (!it) return;
-      $('contactTitle').textContent = it.title;
-      $('contactPrice').textContent = it.type + ' ' + it.price;
+    function openContactModal(item) {
+      $('contactTitle').innerText = item.title;
+      $('contactPrice').innerText = `${item.type} : ${item.price}`;
+      const kakaoMsg = encodeURIComponent(`안녕하세요! 대방OK부동산 홈페이지 보고 [${item.title}] (${item.type} ${item.price}) 문의드립니다.`);
+      $('contactKakao').href = `${KAKAO_1TO1}?text=${kakaoMsg}`;
+      $('contactTel').href = `tel:${PHONE_INQUIRY}`;
+      $('contactTelText').innerText = `(${PHONE_INQUIRY})`;
       openModal('contactModal');
     }
 
-    function toggleTenantFields(v) { $('tenantGroup').classList.toggle('hidden', v !== '세입자 거주'); }
-
     function switchInquiryTab(type) {
-      const sell = type === 'SELL';
-      const on = 'flex-1 pb-3 font-extrabold text-sm border-b-2 border-red-500 text-red-600';
-      const off = 'flex-1 pb-3 font-extrabold text-sm border-b-2 border-transparent text-gray-400 hover:text-gray-600';
-      $('tabSellBtn').className = sell ? on : off;
-      $('tabBuyBtn').className = sell ? off : on;
-      $('sellFields').classList.toggle('hidden', !sell);
-      $('buyFields').classList.toggle('hidden', sell);
-      $('inquiryType').value = sell ? '집 내놓기(매물접수)' : '집 구하기(맞춤상담)';
+      const isSell = type === 'SELL';
+      $('inquiryType').value = isSell ? '집 내놓기(매물접수)' : '집 구하기(맞춤상담)';
+      $('tabSellBtn').className = isSell ? 'flex-1 pb-3 font-extrabold text-sm border-b-2 border-red-500 text-red-600' : 'flex-1 pb-3 font-extrabold text-sm border-b-2 border-transparent text-gray-400 hover:text-gray-600';
+      $('tabBuyBtn').className = !isSell ? 'flex-1 pb-3 font-extrabold text-sm border-b-2 border-red-500 text-red-600' : 'flex-1 pb-3 font-extrabold text-sm border-b-2 border-transparent text-gray-400 hover:text-gray-600';
+      $('sellFields').classList.toggle('hidden', !isSell);
+      $('buyFields').classList.toggle('hidden', isSell);
+      $('inqSubmitBtn').innerHTML = isSell ? '<i class="fa-solid fa-paper-plane"></i> 매물 접수하기' : '<i class="fa-solid fa-paper-plane"></i> 맞춤 상담 신청하기';
     }
+
+    function toggleTenantFields(val) { $('tenantGroup').classList.toggle('hidden', val !== '세입자 거주'); }
 
     async function submitInquiry(e) {
       e.preventDefault();
-      const type = $('inquiryType').value;
-      const sell = type.includes('내놓기');
-      let name, phone, details;
+      if ($('inqHp').value) return;
 
-      if (sell) {
-        name = $('inqOwnerName').value.trim();
-        phone = $('inqOwnerPhone').value.trim();
-        const property = $('inqProperty').value.trim();
-        const resStatus = $('inqResStatus').value;
-        let tenant = '';
-        if (resStatus === '세입자 거주') tenant = `\n[세입자 정보] ${$('inqTenantName').value.trim()} / ${$('inqTenantPhone').value.trim()}`;
-        details = `매물: ${property}\n거래종류: ${$('inqDealType').value} (${$('inqPrice').value.trim()})\n명의자 통신사: ${$('inqTelecom').value}\n거주상태: ${resStatus}${tenant}\n내부옵션: ${$('inqOptions').value.trim()}`;
-        if (!property) return alert('단지명(또는 상가 건물명)과 동호수를 입력해 주세요.');
-      } else {
-        name = $('inqBuyerName').value.trim();
-        phone = $('inqBuyerPhone').value.trim();
-        details = `관심단지: ${$('inqTarget').value.trim()}\n예산범위: ${$('inqBudget').value.trim()}`;
+      if (!$('inqAgree').checked) {
+        alert('개인정보 수집·이용 동의에 체크해 주세요.');
+        $('inqAgree').focus();
+        return;
       }
-      if (!name) return alert('성함을 입력해 주세요.');
-      const digits = phone.replace(/\D/g, '');
-      if (digits.length < 9 || digits.length > 11) return alert('연락처를 올바르게 입력해 주세요. (예: 010-0000-0000)');
-      if (!$('inqAgree').checked) return alert('개인정보 수집·이용에 동의해 주세요.');
+
+      const isSell = $('inquiryType').value.includes('내놓기');
+      let payload = { action: 'submitInquiry', type: $('inquiryType').value, memo: $('inqMemo').value };
+
+      if (isSell) {
+        payload.ownerName = $('inqOwnerName').value;
+        payload.telecom = $('inqTelecom').value;
+        payload.ownerPhone = $('inqOwnerPhone').value;
+        payload.property = $('inqProperty').value;
+        payload.dealType = $('inqDealType').value;
+        payload.price = $('inqPrice').value;
+        payload.resStatus = $('inqResStatus').value;
+        payload.tenantName = $('inqTenantName').value;
+        payload.tenantPhone = $('inqTenantPhone').value;
+        payload.options = $('inqOptions').value;
+
+        if (!payload.ownerName || !payload.ownerPhone || !payload.property || !payload.price) {
+          alert('필수 입력 항목을 모두 입력해 주세요.');
+          return;
+        }
+      } else {
+        payload.buyerName = $('inqBuyerName').value;
+        payload.buyerPhone = $('inqBuyerPhone').value;
+        payload.target = $('inqTarget').value;
+        payload.budget = $('inqBudget').value;
+
+        if (!payload.buyerName || !payload.buyerPhone) {
+          alert('성함과 연락처를 입력해 주세요.');
+          return;
+        }
+      }
 
       const btn = $('inqSubmitBtn');
       busy(btn, true, '접수 중...');
       try {
-        await api({ action: 'inquiry', type, name, phone, details, memo: $('inqMemo').value.trim(), hp: $('inqHp').value });
-        alert('접수가 완료되었습니다! 확인 후 빠르게 연락드리겠습니다.');
-        $('inquiryForm').reset();
-        toggleTenantFields('주인 거주');
+        await api(payload);
+        alert('성공적으로 접수되었습니다! 확인 후 신속하게 연락드리겠습니다.');
         closeModal('inquiryModal');
+        $('inquiryForm').reset();
       } catch (err) {
-        alert('접수에 실패했습니다. 잠시 후 다시 시도하시거나 전화(' + OFFICE_TEL + ')로 문의해 주세요.\n(' + err.message + ')');
+        alert('접수 중 오류가 발생했습니다: ' + err.message);
       } finally {
         busy(btn, false);
       }
     }
 
+    // --- 관리자 기능 ---
     async function verifyAdmin() {
       const pw = $('adminPwInput').value;
-      if (!pw) return;
+      if (!pw) { alert('비밀번호를 입력해 주세요.'); return; }
       const btn = $('adminLoginBtn');
-      busy(btn, true, '확인 중...');
+      busy(btn, true, '인증 중...');
       try {
-        await api({ action: 'login', pw });
+        const data = await api({ action: 'verifyAdmin', password: pw });
         adminPw = pw;
         $('adminAuthSection').classList.add('hidden');
         $('adminPanelSection').classList.remove('hidden');
@@ -711,101 +736,52 @@
     }
 
     function switchAdminSubTab(n) {
-      const on = 'pb-2 px-3 font-bold text-sm border-b-2 border-amber-500 text-amber-600 whitespace-nowrap';
-      const off = 'pb-2 px-3 font-bold text-sm border-b-2 border-transparent text-gray-400 hover:text-gray-600 whitespace-nowrap';
-      ['adminTab1', 'adminTab2', 'adminTab3'].forEach((id, i) => $(id).className = (i + 1 === n) ? on : off);
-      ['adminSecListings', 'adminSecInquiries', 'adminSecPassword'].forEach((id, i) => $(id).classList.toggle('hidden', i + 1 !== n));
+      $('adminSecListings').classList.toggle('hidden', n !== 1);
+      $('adminSecInquiries').classList.toggle('hidden', n !== 2);
+      $('adminSecPassword').classList.toggle('hidden', n !== 3);
+
+      $('adminTab1').className = n === 1 ? 'pb-2 px-3 font-bold text-sm border-b-2 border-amber-500 text-amber-600 whitespace-nowrap' : 'pb-2 px-3 font-bold text-sm border-b-2 border-transparent text-gray-400 hover:text-gray-600 whitespace-nowrap';
+      $('adminTab2').className = n === 2 ? 'pb-2 px-3 font-bold text-sm border-b-2 border-amber-500 text-amber-600 whitespace-nowrap' : 'pb-2 px-3 font-bold text-sm border-b-2 border-transparent text-gray-400 hover:text-gray-600 whitespace-nowrap';
+      $('adminTab3').className = n === 3 ? 'pb-2 px-3 font-bold text-sm border-b-2 border-amber-500 text-amber-600 whitespace-nowrap' : 'pb-2 px-3 font-bold text-sm border-b-2 border-transparent text-gray-400 hover:text-gray-600 whitespace-nowrap';
+
       if (n === 2) loadInquiries();
-    }
-
-    async function loadInquiries() {
-      if (!adminPw) return;
-      $('inquiriesList').innerHTML = '<p class="text-xs text-gray-400 text-center py-6">불러오는 중...</p>';
-      try {
-        inquiries = (await api({ action: 'inquiries', pw: adminPw })).items || [];
-      } catch (err) {
-        $('inquiriesList').innerHTML = `<p class="text-xs text-red-500 text-center py-6">${esc(err.message)}</p>`;
-        return;
-      }
-      renderInquiriesList();
-    }
-
-    function renderInquiriesList() {
-      $('inquiryCount').textContent = inquiries.length;
-      const box = $('inquiriesList');
-      if (!inquiries.length) { box.innerHTML = '<p class="text-xs text-gray-400 text-center py-6">접수된 고객 문의 내역이 없습니다.</p>'; return; }
-      box.innerHTML = inquiries.map(it => `
-        <div class="p-4 bg-gray-50 border rounded-2xl text-xs space-y-1 relative">
-          <div class="flex justify-between gap-2 font-bold text-gray-800 pr-10">
-            <span class="text-red-600">[${esc(it.type)}] ${esc(it.name)}님</span>
-            <span class="text-gray-400 font-normal shrink-0">${esc(it.date)}</span>
-          </div>
-          <p class="text-gray-700 font-semibold">📞 <a href="tel:${esc(it.phone)}" class="underline">${esc(it.phone)}</a></p>
-          <p class="text-gray-600 whitespace-pre-line mt-1 bg-white p-2.5 rounded-xl border">${esc(it.details)}</p>
-          ${it.memo ? `<p class="text-gray-500 bg-amber-50 p-2 rounded-xl border border-amber-100 mt-1">메모: ${esc(it.memo)}</p>` : ''}
-          <button type="button" onclick="deleteInquiry('${esc(it.id)}')" class="absolute top-3 right-3 text-red-500 hover:underline font-bold">삭제</button>
-        </div>`).join('');
-    }
-
-    async function deleteInquiry(id) {
-      if (!confirm('이 접수 내역을 삭제하시겠습니까?')) return;
-      try { await api({ action: 'delInquiry', pw: adminPw, id }); await loadInquiries(); }
-      catch (err) { alert(err.message); }
-    }
-
-    async function changePassword() {
-      const cur = $('currentPw').value, nw = $('newPw').value, cf = $('confirmPw').value;
-      if (!cur) return alert('현재 비밀번호를 입력해 주세요.');
-      if (nw.length < 6) return alert('새 비밀번호는 6자리 이상으로 설정해 주세요.');
-      if (nw !== cf) return alert('새 비밀번호와 확인란이 일치하지 않습니다.');
-      const btn = $('pwBtn');
-      busy(btn, true, '변경 중...');
-      try {
-        await api({ action: 'changePw', pw: cur, newPw: nw });
-        adminPw = nw;
-        ['currentPw', 'newPw', 'confirmPw'].forEach(id => $(id).value = '');
-        alert('관리자 비밀번호가 변경되었습니다.');
-        switchAdminSubTab(1);
-      } catch (err) {
-        alert(err.message);
-      } finally {
-        busy(btn, false);
-      }
     }
 
     function handleFileSelect(e) {
       const file = e.target.files[0];
       if (!file) return;
-      const url = URL.createObjectURL(file), img = new Image();
-      img.onload = () => {
-        const s = Math.min(1, 1000 / Math.max(img.width, img.height));
-        const c = document.createElement('canvas');
-        c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
-        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-        const data = c.toDataURL('image/jpeg', 0.82);
-        URL.revokeObjectURL(url);
-        $('formImg').value = data;
-        $('imagePreview').src = data;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const base64 = evt.target.result;
+        $('formImg').value = base64;
+        $('imagePreview').src = base64;
         $('imagePreviewContainer').classList.remove('hidden');
       };
-      img.onerror = () => alert('이미지를 불러오지 못했습니다. 다른 사진을 선택해 주세요.');
-      img.src = url;
+      reader.readAsDataURL(file);
     }
 
     async function saveListing(e) {
       e.preventDefault();
-      const item = {
-        id: $('editId').value, cat: $('formCat').value, type: $('formType').value,
-        title: $('formTitle').value.trim(), price: $('formPrice').value.trim(), size: $('formSize').value.trim(),
-        desc: $('formDesc').value.trim(), img: $('formImg').value
+      const payload = {
+        action: 'saveListing',
+        password: adminPw,
+        id: $('editId').value || null,
+        cat: $('formCat').value,
+        type: $('formType').value,
+        title: $('formTitle').value,
+        price: $('formPrice').value,
+        size: $('formSize').value,
+        desc: $('formDesc').value,
+        img: $('formImg').value
       };
+
       const btn = $('saveBtn');
       busy(btn, true, '저장 중...');
       try {
-        await api({ action: 'saveListing', pw: adminPw, item });
+        await api(payload);
+        alert('매물이 성공적으로 저장되었습니다!');
         resetAdminForm();
-        await loadListings();
-        alert('매물이 저장되었습니다. 홈페이지에 바로 반영됩니다.');
+        loadListings();
       } catch (err) {
         alert('저장 실패: ' + err.message);
       } finally {
@@ -813,63 +789,132 @@
       }
     }
 
-    function renderAdminList() {
-      const list = listings || [];
-      $('adminListCount').textContent = list.length;
-      $('adminItemsList').json = list.map(it => `
-        <div class="flex justify-between items-center gap-2 p-3 bg-gray-50 rounded-xl text-xs border">
-          <div class="truncate">
-            <span class="font-extrabold text-amber-600">[${esc(it.type)}]</span>
-            <span class="font-bold text-gray-800">${esc(it.title)}</span>
-            <span class="text-gray-500">(${esc(it.price)})</span>
-          </div>
-          <div class="flex gap-1.5 shrink-0">
-            <button type="button" onclick="editListing('${esc(it.id)}')" class="bg-blue-600 text-white px-2.5 py-1 rounded-lg font-bold hover:bg-blue-700">수정</button>
-            <button type="button" onclick="deleteListing('${esc(it.id)}')" class="bg-red-600 text-white px-2.5 py-1 rounded-lg font-bold hover:bg-red-700">삭제</button>
-          </div>
-        </div>`).join('');
-    }
-
-    function editListing(id) {
-      const it = (listings || []).find(x => x.id === id);
-      if (!it) return;
-      $('editId').value = it.id;
-      $('formCat').value = it.cat;
-      $('formType').value = it.type;
-      $('formTitle').value = it.title;
-      $('formPrice').value = it.price;
-      $('formSize').value = it.size;
-      $('formDesc').value = it.desc;
-      $('formImg').value = it.img || '';
-      $('formFileInput').value = '';
-      $('imagePreview').src = it.img || '';
-      $('imagePreviewContainer').classList.toggle('hidden', !it.img);
-      $('listingForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    async function deleteListing(id) {
-      if (!confirm('이 매물을 삭제하시겠습니까?')) return;
-      try { await api({ action: 'delListing', pw: adminPw, id }); await loadListings(); }
-      catch (err) { alert(err.message); }
-    }
-
     function resetAdminForm() {
       $('listingForm').reset();
       $('editId').value = '';
       $('formImg').value = '';
-      $('imagePreview').src = '';
       $('imagePreviewContainer').classList.add('hidden');
+      $('saveBtn').innerText = '매물 저장하기';
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      buildMenus();
-      filterCategory('ALL');
-      loadListings();
-      $('adminPwInput').addEventListener('keydown', e => { if (e.key === 'Enter') verifyAdmin(); });
-      $('contactKakao').href = KAKAO_1TO1;
-      $('contactTel').href = 'tel:' + PHONE_INQUIRY;
-      $('contactTelText').textContent = PHONE_INQUIRY;
-    });
+    function renderAdminItemsList() {
+      const list = $('adminItemsList');
+      $('adminListCount').innerText = listings ? listings.length : 0;
+      if (!listings || listings.length === 0) {
+        list.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">등록된 매물이 없습니다.</p>';
+        return;
+      }
+      let html = '';
+      listings.forEach(item => {
+        html += `
+          <div class="flex items-center justify-between bg-gray-50 p-2.5 rounded-xl border text-xs">
+            <div class="truncate mr-2">
+              <span class="font-bold text-amber-600">[${esc(item.type)}]</span> 
+              <span class="font-bold text-gray-800">${esc(item.title)}</span>
+              <span class="text-gray-500 ml-1">(${esc(item.price)})</span>
+            </div>
+            <div class="flex gap-1.5 shrink-0">
+              <button type="button" onclick="editListing('${item.id}')" class="px-2.5 py-1 bg-blue-100 text-blue-700 font-bold rounded-lg">수정</button>
+              <button type="button" onclick="deleteListing('${item.id}')" class="px-2.5 py-1 bg-red-100 text-red-700 font-bold rounded-lg">삭제</button>
+            </div>
+          </div>
+        `;
+      });
+      list.innerHTML = html;
+    }
+
+    function editListing(id) {
+      const item = listings.find(i => i.id === id);
+      if (!item) return;
+      $('editId').value = item.id;
+      $('formCat').value = item.cat;
+      $('formType').value = item.type;
+      $('formTitle').value = item.title;
+      $('formPrice').value = item.price;
+      $('formSize').value = item.size;
+      $('formDesc').value = item.desc;
+      $('formImg').value = item.img || '';
+      if (item.img) {
+        $('imagePreview').src = item.img;
+        $('imagePreviewContainer').classList.remove('hidden');
+      } else {
+        $('imagePreviewContainer').classList.add('hidden');
+      }
+      $('saveBtn').innerText = '매물 수정 완료';
+      switchAdminSubTab(1);
+    }
+
+    async function deleteListing(id) {
+      if (!confirm('정말 이 매물을 삭제하시겠습니까?')) return;
+      try {
+        await api({ action: 'deleteListing', password: adminPw, id: id });
+        alert('삭제되었습니다.');
+        loadListings();
+      } catch (err) {
+        alert('삭제 실패: ' + err.message);
+      }
+    }
+
+    async function loadInquiries() {
+      try {
+        const data = await api({ action: 'getInquiries', password: adminPw });
+        inquiries = data.inquiries || [];
+        $('inquiryCount').innerText = inquiries.length;
+        
+        const list = $('inquiriesList');
+        if (inquiries.length === 0) {
+          list.innerHTML = '<p class="text-xs text-gray-400 text-center py-8">접수된 내역이 없습니다.</p>';
+          return;
+        }
+
+        let html = '';
+        inquiries.forEach(inq => {
+          html += `
+            <div class="bg-gray-50 border rounded-2xl p-4 text-xs space-y-1.5">
+              <div class="flex justify-between items-center font-bold text-gray-900 border-b pb-1.5">
+                <span>🔔 [${esc(inq.type)}]</span>
+                <span class="text-gray-400 font-normal">${esc(inq.time)}</span>
+              </div>
+              <p><strong>접수 내용:</strong> <span class="text-amber-700 font-bold">${esc(inq.summary || inq.property || inq.target || '내용 없음')}</span></p>
+              <p><strong>메모/요청:</strong> ${esc(inq.memo || '없음')}</p>
+            </div>
+          `;
+        });
+        list.innerHTML = html;
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function changePassword() {
+      const cur = $('currentPw').value;
+      const nw = $('newPw').value;
+      const cf = $('confirmPw').value;
+
+      if (!cur || !nw || !cf) { alert('모든 비밀번호 항목을 입력해 주세요.'); return; }
+      if (nw !== cf) { alert('새 비밀번호와 확인란이 일치하지 않습니다.'); return; }
+
+      const btn = $('pwBtn');
+      busy(btn, true, '변경 중...');
+      try {
+        await api({ action: 'changePassword', password: cur, newPassword: nw });
+        alert('비밀번호가 성공적으로 변경되었습니다. 새 비밀번호로 다시 로그인해 주세요.');
+        adminPw = '';
+        $('adminPanelSection').classList.add('hidden');
+        $('adminAuthSection').classList.remove('hidden');
+        $('adminPwInput').value = '';
+        $('currentPw').value = '';
+        $('newPw').value = '';
+        $('confirmPw').value = '';
+      } catch (err) {
+        alert('변경 실패: ' + err.message);
+      } finally {
+        busy(btn, false);
+      }
+    }
+
+    renderCats();
+    loadListings();
   </script>
 </body>
 </html>
