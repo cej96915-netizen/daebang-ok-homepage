@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>대방OK공인중개사사무소 | 새솔동 부동산 전문</title>
-  <!-- 네이버 서치어드바이저 소유확인 메타태그(<meta name="naver-site-verification" ...>)를 이 줄 아래에 붙여넣으세요 -->
+  <!-- 네이버 서치어드바이저 소유확인 메타태그 -->
+  <meta name="naver-site-verification" content="e65eb82ae114b4bcc07e01815551cd4582bd7e57" />
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -36,7 +37,7 @@
           </div>
         </div>
 
-        <!-- Desktop Menu (카테고리 버튼은 JS가 앞쪽에 채움) -->
+        <!-- Desktop Menu -->
         <div id="menuDesktop" class="hidden md:flex items-center space-x-6 font-semibold text-gray-700 text-sm sm:text-base">
           <button type="button" onclick="openModal('inquiryModal')" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2.5 rounded-xl transition text-sm font-extrabold flex items-center gap-1.5 shadow-sm cursor-pointer">
             <i class="fa-solid fa-file-pen"></i> 간편 매물/상담 접수
@@ -102,7 +103,7 @@
     </div>
   </header>
 
-  <!-- Category Filter Cards (JS가 채움) -->
+  <!-- Category Filter Cards -->
   <section class="max-w-7xl mx-auto px-4 py-8 -mt-6 relative z-20">
     <div id="catGrid" class="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4"></div>
   </section>
@@ -235,7 +236,6 @@
 
       <form id="inquiryForm" onsubmit="submitInquiry(event)" class="space-y-4 text-sm">
         <input type="hidden" id="inquiryType" value="집 내놓기(매물접수)">
-        <!-- 봇 차단용 숨김칸: 사람은 보지도, 채우지도 않습니다 -->
         <input type="text" id="inqHp" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
 
         <div id="sellFields" class="space-y-4">
@@ -338,7 +338,6 @@
           <textarea id="inqMemo" rows="2" placeholder="원하시는 입주일이나 참고사항을 작성해 주세요." class="w-full border rounded-xl p-2.5"></textarea>
         </div>
 
-        <!-- 개인정보 수집·이용 동의 (보유기간 등은 실제 운영 기준에 맞게 수정하세요) -->
         <label class="flex items-start gap-2 text-xs text-gray-600 bg-gray-50 border rounded-xl p-3 cursor-pointer">
           <input type="checkbox" id="inqAgree" class="mt-0.5 shrink-0">
           <span>
@@ -357,7 +356,7 @@
     </div>
   </div>
 
-  <!-- 매물 문의 방법 선택 (카카오톡 / 전화) -->
+  <!-- Contact Choice Modal -->
   <div id="contactModal" onclick="if (event.target === this) closeModal('contactModal')" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl relative">
       <button type="button" onclick="closeModal('contactModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl font-bold">✕</button>
@@ -376,7 +375,7 @@
     </div>
   </div>
 
-  <!-- Admin Modal (비밀번호는 서버에서 확인) -->
+  <!-- Admin Modal -->
   <div id="adminModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
       <button type="button" onclick="closeModal('adminModal')" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-2xl font-bold">✕</button>
@@ -507,14 +506,12 @@
   </div>
 
   <script>
-    // ★ Apps Script 배포 후 받은 웹 앱 URL을 아래에 붙여넣으세요 (https://script.google.com/macros/s/.../exec)
     const API_URL = 'https://script.google.com/macros/s/AKfycbw439BPX29tytQBNrDGvhvZLv6Q9H-EPtEfRRl5x-eYKEdGWg12iA5FsmON6_JH7_vU/exec';
     const READY = API_URL.indexOf('https://script.google.com/') === 0;
     const OFFICE_TEL = '031-355-8829';
     const KAKAO_1TO1 = 'https://open.kakao.com/o/sLn6XTli';
-    const PHONE_INQUIRY = '010-2417-7611';   // 매물 문의 전화번호 (바꾸려면 여기만 수정)
+    const PHONE_INQUIRY = '010-2417-7611';
 
-    // [키, 상단메뉴 이름, 카드 이름, 이모지, 목록 제목]
     const CATS = [
       ['ALL', '전체매물', '전체 매물', '🏢', '전체 매물 목록'],
       ['APT', '아파트', '아파트', '🏘️', '아파트 매물 목록'],
@@ -524,11 +521,11 @@
     ];
     const CAT_NAME = { APT: '아파트', STORE: '상가/점포', OFFICE: '오피스텔', HOUSE: '주택' };
 
-    let listings = null;      // null = 불러오는 중/실패
+    let listings = null;
     let listError = '';
     let inquiries = [];
     let currentCategory = 'ALL';
-    let adminPw = '';         // 메모리에만 보관 (새로고침하면 다시 로그인)
+    let adminPw = '';
 
     const $ = id => document.getElementById(id);
     const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -540,7 +537,6 @@
       btn.disabled = on;
     }
 
-    // 서버 호출 (본문을 text/plain 으로 보내 브라우저 사전검사(CORS preflight)를 피함)
     async function api(body) {
       if (!READY) throw new Error('접수 시스템 설정(API 주소)이 아직 끝나지 않았습니다.');
       const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(body) });
@@ -584,7 +580,6 @@
       renderListings();
     }
 
-    // ---------- 매물 (서버에서 불러오기) ----------
     async function loadListings() {
       listings = null; listError = '';
       renderListings();
@@ -635,7 +630,6 @@
       renderAdminList();
     }
 
-    // ---------- 매물 문의: 카카오톡 / 전화 선택 ----------
     function openContact(id) {
       const it = (listings || []).find(x => x.id === id);
       if (!it) return;
@@ -644,7 +638,6 @@
       openModal('contactModal');
     }
 
-    // ---------- 손님 접수 ----------
     function toggleTenantFields(v) { $('tenantGroup').classList.toggle('hidden', v !== '세입자 거주'); }
 
     function switchInquiryTab(type) {
@@ -698,7 +691,6 @@
       }
     }
 
-    // ---------- 관리자 ----------
     async function verifyAdmin() {
       const pw = $('adminPwInput').value;
       if (!pw) return;
@@ -780,7 +772,6 @@
       }
     }
 
-    // 사진: 폰 사진은 용량이 커서 긴 변 1000px 이하로 줄여서 올림
     function handleFileSelect(e) {
       const file = e.target.files[0];
       if (!file) return;
